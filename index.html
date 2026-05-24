@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DailyOS">
+<meta name="theme-color" content="#0f0f0f">
+<title>Lakshman · Daily OS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf8f4;
+  --bg2: #f3efe8;
+  --card: #ffffff;
+  --ink: #1a1714;
+  --ink2: #5c564d;
+  --ink3: #9a9286;
+  --gold: #b8860b;
+  --gold-l: #d4a843;
+  --gold-bg: #fdf6e3;
+  --green: #1a6b4a;
+  --green-bg: #e8f5ef;
+  --orange: #c66a1d;
+  --orange-bg: #fef0e3;
+  --red: #b33a3a;
+  --red-bg: #fce8e8;
+  --indigo: #4a4a8a;
+  --indigo-bg: #ededf7;
+  --border: #e6e1d9;
+  --border2: #d4cfc5;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+  --shadow2: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
+  --radius: 10px;
+  --radius-lg: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f0f0f; --bg2: #1a1a1a; --card: #222220; --ink: #ede8df;
+    --ink2: #a09a8f; --ink3: #6b665e; --gold: #d4a843; --gold-l: #e8c97a;
+    --gold-bg: #2a2210; --green: #3da87a; --green-bg: #0f2a1e; --orange: #e8943a;
+    --orange-bg: #2a1a08; --red: #e05555; --red-bg: #2a1010; --indigo: #8888cc;
+    --indigo-bg: #1a1a2e; --border: #333330; --border2: #444440;
+    --shadow: 0 1px 3px rgba(0,0,0,0.2); --shadow2: 0 2px 8px rgba(0,0,0,0.3);
+  }
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; overflow: hidden; }
+body {
+  font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink);
+  height: 100%; overflow: hidden; display: flex; flex-direction: column;
+}
+input, textarea, button, select { font-family: inherit; }
+textarea { resize: vertical; }
+button { cursor: pointer; }
+
+/* ═══ HEADER ═══ */
+.header {
+  background: #0f0f0f; padding: 12px 20px; padding-top: calc(12px + var(--safe-top));
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid var(--gold); flex-shrink: 0; z-index: 100;
+}
+.header-brand { display: flex; align-items: baseline; gap: 10px; }
+.header h1 {
+  font-family: 'Crimson Pro', serif; color: var(--gold-l); font-size: 1.25rem;
+  font-weight: 600; letter-spacing: 0.3px;
+}
+.header .tagline {
+  color: #6b665e; font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
+}
+.header-right { display: flex; align-items: center; gap: 10px; }
+.streak-badge {
+  background: var(--gold); color: #0f0f0f; padding: 3px 10px; border-radius: 12px;
+  font-size: 0.68rem; font-weight: 700; white-space: nowrap;
+}
+.sync-btn {
+  background: transparent; border: 1px solid #444; color: #a09a8f; padding: 5px 10px;
+  border-radius: 6px; font-size: 0.68rem; transition: all 0.2s;
+}
+.sync-btn:hover { border-color: var(--gold); color: var(--gold); }
+.sync-btn.syncing { animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ═══ DATE NAV ═══ */
+.date-nav {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 10px 20px; background: var(--bg2); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.date-nav button {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  padding: 4px 12px; font-size: 0.85rem; color: var(--ink2); transition: all 0.15s;
+}
+.date-nav button:hover { border-color: var(--gold); color: var(--gold); }
+.date-nav button:disabled { opacity: 0.3; cursor: default; }
+.date-nav .date-center { text-align: center; min-width: 160px; }
+.date-nav .day-name { font-weight: 600; font-size: 0.9rem; }
+.date-nav .day-date { font-size: 0.72rem; color: var(--ink3); font-family: 'JetBrains Mono', monospace; }
+.today-btn {
+  background: var(--gold) !important; color: #0f0f0f !important;
+  border: none !important; font-size: 0.7rem !important; font-weight: 600;
+  padding: 4px 10px !important; border-radius: 6px;
+}
+
+/* ═══ TABS ═══ */
+.tabs {
+  display: flex; background: var(--card); border-bottom: 1px solid var(--border);
+  flex-shrink: 0; position: relative; overflow-x: auto;
+}
+.tab {
+  flex: 1; padding: 10px 6px; background: none; border: none;
+  font-size: 0.72rem; font-weight: 400; color: var(--ink3);
+  border-bottom: 2.5px solid transparent; transition: all 0.2s;
+  white-space: nowrap; min-width: 0;
+}
+.tab.active { color: var(--gold); font-weight: 600; border-bottom-color: var(--gold); }
+.tab .tab-icon { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+
+/* ═══ SCROLL CONTAINER ═══ */
+.main-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; padding: 16px 16px calc(16px + var(--safe-bottom));
+}
+.main-scroll > *:last-child { margin-bottom: 20px; }
+
+/* ═══ CARDS ═══ */
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow);
+}
+.card-header {
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1.8px; margin-bottom: 12px; display: flex;
+  align-items: center; gap: 8px;
+}
+.card-header .dot {
+  width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
+}
+
+/* ═══ SCORE RING ═══ */
+.score-section {
+  display: flex; gap: 16px; align-items: center; padding: 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  margin-bottom: 14px; box-shadow: var(--shadow);
+}
+.score-ring { flex-shrink: 0; }
+.score-info { flex: 1; min-width: 0; }
+.score-info .label { font-size: 0.68rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.score-info .nudge { font-size: 0.8rem; line-height: 1.55; color: var(--ink); }
+.score-info .compare { font-size: 0.68rem; color: var(--ink3); font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+
+/* ═══ MOOD/ENERGY ═══ */
+.mood-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.mood-card {
+  flex: 1; background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px; text-align: center;
+}
+.mood-card .label { font-size: 0.62rem; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.mood-btn {
+  background: none; border: none; font-size: 1.2rem; padding: 2px;
+  transition: transform 0.15s, opacity 0.15s; opacity: 0.25;
+}
+.mood-btn.active { opacity: 1; transform: scale(1.15); }
+
+/* ═══ PRIORITIES ═══ */
+.priority-input {
+  width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+  border-radius: 7px; font-size: 0.84rem; background: var(--bg);
+  color: var(--ink); margin-bottom: 6px; transition: border-color 0.2s;
+}
+.priority-input:focus { outline: none; border-color: var(--gold); }
+.priority-input.filled { background: var(--green-bg); border-color: var(--green); }
+
+/* ═══ ROUTINE BLOCKS ═══ */
+.routine-section { margin-bottom: 14px; }
+.routine-label {
+  font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 2px; margin-bottom: 8px; padding-left: 4px;
+  display: flex; align-items: center; gap: 8px;
+}
+.routine-label .count { font-weight: 400; color: var(--ink3); }
+.routine-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 5px; transition: all 0.2s; border-left: 3.5px solid var(--border2);
+  -webkit-user-select: none; user-select: none;
+}
+.routine-item:active { transform: scale(0.985); }
+.routine-item.done { border-left-color: var(--green); background: var(--green-bg); }
+.routine-item.cat-morning { border-left-color: var(--orange); }
+.routine-item.cat-morning.done { border-left-color: var(--green); }
+.routine-item.cat-work { border-left-color: var(--green); }
+.routine-item.cat-evening { border-left-color: var(--indigo); }
+.routine-item.cat-evening.done { border-left-color: var(--green); }
+.routine-icon { font-size: 1.2rem; opacity: 0.5; flex-shrink: 0; transition: opacity 0.2s; }
+.routine-item.done .routine-icon { opacity: 1; }
+.routine-text { flex: 1; min-width: 0; }
+.routine-name { font-size: 0.84rem; font-weight: 500; transition: all 0.2s; }
+.routine-item.done .routine-name { color: var(--green); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.routine-meta { font-size: 0.65rem; color: var(--ink3); font-family: 'JetBrains Mono', monospace; margin-top: 1px; }
+.check-circle {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all 0.2s; font-size: 0.65rem; color: white;
+}
+.routine-item.done .check-circle { background: var(--green); border-color: var(--green); }
+
+/* ═══ HABIT CHIPS ═══ */
+.habit-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.habit-chip {
+  padding: 7px 13px; border-radius: 20px; border: 1.5px solid var(--border);
+  background: var(--card); font-size: 0.76rem; transition: all 0.2s;
+  -webkit-user-select: none; user-select: none;
+}
+.habit-chip:active { transform: scale(0.95); }
+.habit-chip.active { background: var(--green); border-color: var(--green); color: white; }
+.habit-chip .pts { font-size: 0.6rem; opacity: 0.6; margin-left: 3px; }
+
+/* ═══ JOURNAL TEXTAREAS ═══ */
+.journal-area {
+  width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 0.84rem; line-height: 1.7; background: var(--bg); color: var(--ink);
+  font-family: 'Crimson Pro', serif; min-height: 80px;
+}
+.journal-area:focus { outline: none; border-color: var(--gold); }
+.char-count { text-align: right; font-size: 0.62rem; color: var(--ink3); margin-top: 3px; }
+
+/* ═══ TASKS ═══ */
+.task-add { display: flex; gap: 8px; margin-bottom: 12px; }
+.task-input {
+  flex: 1; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 0.84rem; background: var(--bg); color: var(--ink);
+}
+.task-input:focus { outline: none; border-color: var(--gold); }
+.add-btn {
+  background: var(--gold); color: #0f0f0f; border: none; border-radius: 8px;
+  padding: 9px 16px; font-weight: 600; font-size: 0.82rem; white-space: nowrap;
+}
+.filter-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border);
+  background: transparent; font-size: 0.72rem; color: var(--ink2); transition: all 0.15s;
+}
+.filter-btn.active { background: var(--gold); border-color: var(--gold); color: #0f0f0f; font-weight: 600; }
+.carry-btn {
+  margin-left: auto; padding: 5px 10px; border-radius: 14px; border: 1px solid var(--border);
+  background: transparent; font-size: 0.68rem; color: var(--ink3);
+}
+.task-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 5px;
+}
+.task-check {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border2);
+  background: none; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 0.6rem; color: white; transition: all 0.15s;
+}
+.task-check.done { background: var(--green); border-color: var(--green); }
+.task-text { flex: 1; font-size: 0.84rem; }
+.task-text.done { text-decoration: line-through; color: var(--ink3); }
+.task-cat {
+  font-size: 0.58rem; color: var(--ink3); text-transform: uppercase; padding: 2px 7px;
+  background: var(--bg2); border-radius: 6px;
+}
+.task-del { background: none; border: none; color: var(--red); font-size: 0.75rem; opacity: 0.4; padding: 4px; }
+.task-stats {
+  display: flex; justify-content: space-around; padding: 12px; background: var(--bg2);
+  border-radius: 8px; margin-top: 12px; font-size: 0.72rem; color: var(--ink2);
+}
+.task-stats strong { font-weight: 700; }
+
+/* ═══ INSIGHTS ═══ */
+.nudge-box {
+  background: linear-gradient(135deg, #0f0f0f, #1a1a18); border-radius: var(--radius-lg);
+  padding: 18px; margin-bottom: 14px;
+}
+.nudge-item {
+  color: #e8e0d4; font-size: 0.8rem; line-height: 1.6; margin-bottom: 10px;
+  padding-left: 10px; border-left: 2px solid var(--gold);
+}
+.nudge-item:last-child { margin-bottom: 0; }
+.trend-bar-row { display: flex; align-items: flex-end; gap: 6px; height: 100px; padding-bottom: 18px; position: relative; }
+.trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.trend-val { font-size: 0.6rem; color: var(--ink3); font-family: 'JetBrains Mono', monospace; }
+.trend-bar {
+  width: 100%; max-width: 32px; border-radius: 3px 3px 0 0; transition: height 0.5s ease;
+  min-height: 3px;
+}
+.trend-day { font-size: 0.58rem; color: var(--ink3); }
+.trend-day.today { color: var(--gold); font-weight: 700; }
+.progress-row { margin-bottom: 10px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 0.76rem; margin-bottom: 4px; }
+.progress-label span:last-child { color: var(--ink3); font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+.progress-track { height: 7px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; text-align: center;
+}
+.stat-card .icon { font-size: 1.3rem; margin-bottom: 4px; }
+.stat-card .val { font-weight: 700; font-size: 1.05rem; font-family: 'JetBrains Mono', monospace; }
+.stat-card .lbl { font-size: 0.62rem; color: var(--ink3); margin-top: 2px; }
+.journal-preview { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.journal-preview:last-child { border: none; margin: 0; padding: 0; }
+.journal-date { font-size: 0.65rem; color: var(--gold); font-family: 'JetBrains Mono', monospace; margin-bottom: 3px; }
+.journal-text { font-size: 0.8rem; color: var(--ink); line-height: 1.55; font-family: 'Crimson Pro', serif; }
+
+/* ═══ EXPORT SECTION ═══ */
+.export-section { text-align: center; padding: 16px; }
+.export-btn {
+  background: none; border: 1px solid var(--border); color: var(--ink2); padding: 8px 18px;
+  border-radius: 6px; font-size: 0.76rem; margin: 4px;
+}
+.export-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ═══ EMPTY STATE ═══ */
+.empty { text-align: center; padding: 32px; color: var(--ink3); font-size: 0.84rem; }
+
+/* ═══ TOAST ═══ */
+.toast {
+  position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%; transform: translateX(-50%);
+  background: #0f0f0f; color: var(--gold-l); padding: 10px 20px; border-radius: 8px;
+  font-size: 0.78rem; z-index: 999; opacity: 0; transition: opacity 0.3s;
+  pointer-events: none; box-shadow: var(--shadow2);
+}
+.toast.show { opacity: 1; }
+
+/* ═══ RESPONSIVE ═══ */
+@media (min-width: 700px) {
+  .main-scroll { max-width: 640px; margin: 0 auto; padding: 24px 24px calc(24px + var(--safe-bottom)); }
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <h1>Daily OS</h1>
+    <span class="tagline">Every day better</span>
+  </div>
+  <div class="header-right">
+    <span class="streak-badge" id="streakBadge" style="display:none">🔥 0d</span>
+    <button class="sync-btn" id="syncBtn" onclick="syncToClaude()" title="Copy data for Claude analysis">⇧ Sync</button>
+  </div>
+</div>
+
+<!-- DATE NAV -->
+<div class="date-nav">
+  <button onclick="navDate(-1)" id="prevBtn">◀</button>
+  <div class="date-center">
+    <div class="day-name" id="dayName"></div>
+    <div class="day-date" id="dayDate"></div>
+  </div>
+  <button onclick="navDate(1)" id="nextBtn">▶</button>
+  <button class="today-btn" id="todayBtn" onclick="goToday()" style="display:none">Today</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" data-tab="today" onclick="switchTab('today')">
+    <span class="tab-icon">📋</span>Today
+  </button>
+  <button class="tab" data-tab="journal" onclick="switchTab('journal')">
+    <span class="tab-icon">📝</span>Journal
+  </button>
+  <button class="tab" data-tab="tasks" onclick="switchTab('tasks')">
+    <span class="tab-icon">✅</span>Tasks
+  </button>
+  <button class="tab" data-tab="insights" onclick="switchTab('insights')">
+    <span class="tab-icon">📊</span>Insights
+  </button>
+</div>
+
+<!-- MAIN SCROLL AREA -->
+<div class="main-scroll" id="mainScroll"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA LAYER — IndexedDB with localStorage fallback
+// ═══════════════════════════════════════════
+const DB_NAME = 'LakshmanDailyOS';
+const DB_VER = 1;
+const STORE = 'days';
+let db = null;
+let allData = {};
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = (e) => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE);
+    };
+    req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+    req.onerror = () => {
+      console.warn('IndexedDB failed, using localStorage');
+      resolve(null);
+    };
+  });
+}
+
+function idbGet(key) {
+  if (!db) { try { return JSON.parse(localStorage.getItem('dos_' + key)); } catch { return null; } }
+  return new Promise((resolve) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).get(key);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => resolve(null);
+  });
+}
+
+function idbSet(key, val) {
+  if (!db) { localStorage.setItem('dos_' + key, JSON.stringify(val)); return Promise.resolve(); }
+  return new Promise((resolve) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(val, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+
+function idbGetAll() {
+  if (!db) {
+    const result = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k.startsWith('dos_')) {
+        try { result[k.replace('dos_', '')] = JSON.parse(localStorage.getItem(k)); } catch {}
+      }
+    }
+    return Promise.resolve(result);
+  }
+  return new Promise((resolve) => {
+    const result = {};
+    const tx = db.transaction(STORE, 'readonly');
+    const store = tx.objectStore(STORE);
+    const req = store.openCursor();
+    req.onsuccess = (e) => {
+      const cursor = e.target.result;
+      if (cursor) { result[cursor.key] = cursor.value; cursor.continue(); }
+      else resolve(result);
+    };
+    req.onerror = () => resolve(result);
+  });
+}
+
+// ═══════════════════════════════════════════
+// ROUTINE & HABIT DEFINITIONS
+// ═══════════════════════════════════════════
+const ROUTINE = [
+  { id:'walk_chase', time:'5:00–5:45', label:'Walk Chase', icon:'🐕', cat:'morning', pts:10 },
+  { id:'pranayama', time:'5:45–6:30', label:'Pranayama & Yoga', icon:'🧘', cat:'morning', pts:15 },
+  { id:'family_morning', time:'6:30–7:15', label:'Family Time / Daughter Ready', icon:'👨‍👧', cat:'morning', pts:10 },
+  { id:'reading_morning', time:'7:15–7:50', label:'Morning Reading / School Drop', icon:'📖', cat:'morning', pts:8 },
+  { id:'commute_prep', time:'8:15–8:45', label:'Commute Prep — 3 Priorities', icon:'🎯', cat:'morning', pts:12 },
+  { id:'landing_ritual', time:'9:30–9:45', label:'Landing Ritual — No Email First', icon:'☕', cat:'work', pts:8 },
+  { id:'deep_work_1', time:'9:45–11:00', label:'Deep Work Block 1', icon:'🔬', cat:'work', pts:15 },
+  { id:'meetings', time:'11:00–1:00', label:'Meetings with Outcomes', icon:'🤝', cat:'work', pts:10 },
+  { id:'lunch_human', time:'1:00–1:45', label:'Lunch + Human Connection', icon:'🍽️', cat:'work', pts:8 },
+  { id:'midday_reset', time:'1:45–2:00', label:'Midday Reset & Review', icon:'🔄', cat:'work', pts:10 },
+  { id:'deep_work_2', time:'2:00–3:30', label:'Deep Work Block 2', icon:'⚡', cat:'work', pts:15 },
+  { id:'team_flex', time:'3:30–5:30', label:'Team / Flex / Follow-ups', icon:'👥', cat:'work', pts:8 },
+  { id:'eod_review', time:'5:30–6:00', label:'EOD Review & Tomorrow Prep', icon:'📋', cat:'work', pts:10 },
+  { id:'family_evening', time:'7:00–10:00', label:'Family Time & Dinner', icon:'🏠', cat:'evening', pts:10 },
+  { id:'reading_night', time:'10:00–11:00', label:'Night Reading', icon:'📚', cat:'evening', pts:10 },
+  { id:'sleep', time:'11:00', label:'Lights Out by 11 PM', icon:'🌙', cat:'evening', pts:8 },
+];
+
+const HABITS = [
+  { id:'water_intake', label:'8+ Glasses Water', icon:'💧', pts:5 },
+  { id:'no_phone_morning', label:'No Phone Before 8 AM', icon:'📵', pts:8 },
+  { id:'gratitude', label:'Gratitude Practice', icon:'🙏', pts:5 },
+  { id:'exercise_extra', label:'Extra Physical Activity', icon:'🏃', pts:8 },
+  { id:'learning', label:'New Learning / Skill', icon:'🧠', pts:10 },
+];
+
+const MAX_SCORE = ROUTINE.reduce((s,r) => s + r.pts, 0) + HABITS.reduce((s,h) => s + h.pts, 0) + 30; // +30 for journal/priorities/wins/improvements
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentDate = new Date();
+let currentTab = 'today';
+let saveTimer = null;
+
+function dk(d) { return d.toISOString().split('T')[0]; }
+function todayKey() { return dk(new Date()); }
+function getDayData(key) {
+  return allData[key] || { routine:{}, habits:{}, journal:'', priorities:['','',''], improvements:'', wins:'', mood:0, energy:0, decisions:'', gratitude:'', tasks:[] };
+}
+
+function score(d) {
+  if (!d) return 0;
+  let s = 0;
+  ROUTINE.forEach(r => { if (d.routine?.[r.id]) s += r.pts; });
+  HABITS.forEach(h => { if (d.habits?.[h.id]) s += h.pts; });
+  if (d.journal?.trim()) s += 10;
+  if (d.priorities?.filter(p => p?.trim()).length >= 3) s += 10;
+  if (d.improvements?.trim()) s += 5;
+  if (d.wins?.trim()) s += 5;
+  return s;
+}
+
+function getStreak() {
+  let streak = 0;
+  let d = new Date(); d.setDate(d.getDate() - 1);
+  while (true) {
+    const day = allData[dk(d)];
+    if (!day?.routine || Object.values(day.routine).filter(Boolean).length < 8) break;
+    streak++; d.setDate(d.getDate() - 1);
+  }
+  const td = allData[todayKey()];
+  if (td?.routine && Object.values(td.routine).filter(Boolean).length >= 8) streak++;
+  return streak;
+}
+
+// ═══════════════════════════════════════════
+// SAVE
+// ═══════════════════════════════════════════
+function saveCurrent() {
+  const key = dk(currentDate);
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await idbSet(key, allData[key]);
+    showToast('Saved ✓');
+  }, 500);
+}
+
+// ═══════════════════════════════════════════
+// NUDGE ENGINE
+// ═══════════════════════════════════════════
+function getNudges() {
+  const key = dk(currentDate);
+  const td = getDayData(key);
+  const yd = allData[dk(new Date(currentDate.getTime() - 86400000))];
+  const ts = score(td), ys = score(yd);
+  const nudges = [];
+
+  if (ys > 0) {
+    if (ts > ys) nudges.push(`📈 You scored ${ts} today vs ${ys} yesterday — +${ts - ys} points. Keep this momentum.`);
+    else if (ts === ys) nudges.push(`⚖️ Same score as yesterday (${ts}). Consistency matters, but push for +5 tomorrow.`);
+    else nudges.push(`📉 Today: ${ts} vs yesterday's ${ys}. Identify what slipped and reclaim it tomorrow.`);
+  }
+
+  const missed = ROUTINE.filter(r => !td.routine?.[r.id]);
+  if (missed.length > 0 && missed.length <= 5) {
+    nudges.push(`🎯 Missing: ${missed.map(m => m.label).join(', ')}. Worth ${missed.reduce((s,m) => s + m.pts, 0)} points.`);
+  }
+
+  const mDone = ROUTINE.filter(r => r.cat === 'morning' && td.routine?.[r.id]).length;
+  const mTotal = ROUTINE.filter(r => r.cat === 'morning').length;
+  if (mDone === mTotal) nudges.push('🌅 Perfect morning block. This discipline compounds.');
+  else if (mDone < 3) nudges.push('⚠️ Morning block needs work. Strong mornings define your day.');
+
+  if (!td.journal?.trim()) nudges.push('📝 No journal entry yet. Even 2 sentences create accountability.');
+
+  if (!td.routine?.deep_work_1 && !td.routine?.deep_work_2) {
+    nudges.push('🔬 No deep work blocks done. Your strategic impact lives here — protect them.');
+  }
+
+  const weekScores = [];
+  for (let i = 0; i < 7; i++) {
+    const s = score(allData[dk(new Date(currentDate.getTime() - i * 86400000))]);
+    if (s > 0) weekScores.push(s);
+  }
+  if (weekScores.length >= 3) {
+    const avg = Math.round(weekScores.reduce((a,b) => a+b, 0) / weekScores.length);
+    nudges.push(`📊 ${weekScores.length}-day avg: ${avg}/${MAX_SCORE}. ${avg > MAX_SCORE * 0.7 ? 'Strong execution.' : 'Focus on morning block first.'}`);
+  }
+
+  const completed = Object.values(td.routine || {}).filter(Boolean).length;
+  if (completed >= 14) nudges.push('🔥 Near-perfect day. This is CTO-level discipline.');
+
+  return nudges.length ? nudges : ['Start checking off your routine. Every box is a promise kept to yourself.'];
+}
+
+// ═══════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════
+function render() {
+  updateDateNav();
+  updateStreak();
+  const el = document.getElementById('mainScroll');
+  switch (currentTab) {
+    case 'today': el.innerHTML = renderToday(); break;
+    case 'journal': el.innerHTML = renderJournal(); break;
+    case 'tasks': el.innerHTML = renderTasks(); break;
+    case 'insights': el.innerHTML = renderInsights(); break;
+  }
+  el.scrollTop = 0;
+}
+
+function updateDateNav() {
+  const d = currentDate;
+  document.getElementById('dayName').textContent = d.toLocaleDateString('en-IN', { weekday: 'long' });
+  document.getElementById('dayDate').textContent = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  const isToday = dk(d) === todayKey();
+  document.getElementById('nextBtn').disabled = isToday;
+  document.getElementById('todayBtn').style.display = isToday ? 'none' : 'block';
+}
+
+function updateStreak() {
+  const s = getStreak();
+  const badge = document.getElementById('streakBadge');
+  if (s > 0) { badge.style.display = 'inline'; badge.textContent = `🔥 ${s}d`; }
+  else badge.style.display = 'none';
+}
+
+function renderScoreRing(s, max, size) {
+  const pct = max > 0 ? s / max : 0;
+  const r = (size - 12) / 2;
+  const circ = 2 * Math.PI * r;
+  const off = circ * (1 - pct);
+  const col = pct >= 0.8 ? 'var(--green)' : pct >= 0.5 ? 'var(--gold)' : 'var(--red)';
+  return `<svg width="${size}" height="${size}" class="score-ring">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--border)" stroke-width="7"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${col}" stroke-width="7"
+      stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round"
+      transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset 0.8s ease"/>
+    <text x="${size/2}" y="${size/2 - 6}" text-anchor="middle" style="font-size:${size > 100 ? '1.4rem' : '1.1rem'};font-weight:700;fill:var(--ink);font-family:'JetBrains Mono',monospace">${s}</text>
+    <text x="${size/2}" y="${size/2 + 10}" text-anchor="middle" style="font-size:0.6rem;fill:var(--ink3);font-family:'Outfit',sans-serif">of ${max}</text>
+  </svg>`;
+}
+
+// ─── TODAY TAB ───
+function renderToday() {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  const s = score(d);
+  const yd = allData[dk(new Date(currentDate.getTime() - 86400000))];
+  const ys = score(yd);
+  const nudges = getNudges();
+
+  let html = '';
+
+  // Score section
+  html += `<div class="score-section">
+    ${renderScoreRing(s, MAX_SCORE, 100)}
+    <div class="score-info">
+      <div class="label">Day Score</div>
+      <div class="nudge">${nudges[0]}</div>
+      ${yd ? `<div class="compare">Yesterday: ${ys}/${MAX_SCORE}</div>` : ''}
+    </div>
+  </div>`;
+
+  // Mood & Energy
+  const moodEmojis = ['😫','😐','🙂','😊','🔥'];
+  const energyEmojis = ['🪫','😴','⚡','💪','🚀'];
+  html += `<div class="mood-row">
+    <div class="mood-card">
+      <div class="label">Mood</div>
+      <div>${moodEmojis.map((e,i) => `<button class="mood-btn ${(d.mood||0) >= i+1 ? 'active' : ''}" onclick="setField('mood',${i+1})">${e}</button>`).join('')}</div>
+    </div>
+    <div class="mood-card">
+      <div class="label">Energy</div>
+      <div>${energyEmojis.map((e,i) => `<button class="mood-btn ${(d.energy||0) >= i+1 ? 'active' : ''}" onclick="setField('energy',${i+1})">${e}</button>`).join('')}</div>
+    </div>
+  </div>`;
+
+  // Priorities
+  html += `<div class="card">
+    <div class="card-header"><span class="dot" style="background:var(--gold)"></span> Today's 3 Priorities</div>
+    ${(d.priorities||['','','']).map((p,i) => `<input class="priority-input ${p?.trim() ? 'filled' : ''}" value="${esc(p||'')}" placeholder="Priority ${i+1}" oninput="setPriority(${i},this.value)">`).join('')}
+  </div>`;
+
+  // Routine blocks by category
+  const cats = [
+    { key:'morning', label:'Morning Block', icon:'🌅', color:'var(--orange)' },
+    { key:'work', label:'Office Day', icon:'💼', color:'var(--green)' },
+    { key:'evening', label:'Evening Block', icon:'🏠', color:'var(--indigo)' },
+  ];
+  for (const cat of cats) {
+    const items = ROUTINE.filter(r => r.cat === cat.key);
+    const done = items.filter(r => d.routine?.[r.id]).length;
+    html += `<div class="routine-section">
+      <div class="routine-label" style="color:${cat.color}">${cat.icon} ${cat.label} <span class="count">${done}/${items.length}</span></div>
+      ${items.map(r => {
+        const checked = !!d.routine?.[r.id];
+        return `<div class="routine-item cat-${cat.key} ${checked ? 'done' : ''}" onclick="toggleRoutine('${r.id}')">
+          <span class="routine-icon">${checked ? '✅' : r.icon}</span>
+          <div class="routine-text">
+            <div class="routine-name">${r.label}</div>
+            <div class="routine-meta">${r.time} · ${r.pts} pts</div>
+          </div>
+          <div class="check-circle">${checked ? '✓' : ''}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  // Bonus Habits
+  html += `<div class="card">
+    <div class="card-header"><span class="dot" style="background:var(--gold)"></span> Bonus Habits</div>
+    <div class="habit-chips">
+      ${HABITS.map(h => `<button class="habit-chip ${d.habits?.[h.id] ? 'active' : ''}" onclick="toggleHabit('${h.id}')">${h.icon} ${h.label}<span class="pts">+${h.pts}</span></button>`).join('')}
+    </div>
+  </div>`;
+
+  return html;
+}
+
+// ─── JOURNAL TAB ───
+function renderJournal() {
+  const d = getDayData(dk(currentDate));
+  return `
+    <div class="card">
+      <div class="card-header"><span class="dot" style="background:var(--green)"></span> Today's Wins</div>
+      <textarea class="journal-area" rows="3" placeholder="What went well today? What are you proud of?" oninput="setField('wins',this.value)">${esc(d.wins||'')}</textarea>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="dot" style="background:var(--orange)"></span> Areas to Improve</div>
+      <textarea class="journal-area" rows="3" placeholder="What could be better? What will you do differently tomorrow?" oninput="setField('improvements',this.value)">${esc(d.improvements||'')}</textarea>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="dot" style="background:var(--gold)"></span> Daily Journal — +10 pts</div>
+      <textarea class="journal-area" rows="8" placeholder="How was your day? Key decisions, observations, leadership moments, personal reflections..." oninput="setField('journal',this.value)" id="journalArea">${esc(d.journal||'')}</textarea>
+      <div class="char-count">${(d.journal||'').length} characters</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="dot" style="background:var(--indigo)"></span> Key Decisions Today</div>
+      <textarea class="journal-area" rows="4" placeholder="What decisions did you make? Reactive or proactive? Who owns what?" oninput="setField('decisions',this.value)">${esc(d.decisions||'')}</textarea>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="dot" style="background:var(--green)"></span> Grateful For</div>
+      <textarea class="journal-area" rows="2" placeholder="Three things you're grateful for today..." oninput="setField('gratitude',this.value)">${esc(d.gratitude||'')}</textarea>
+    </div>
+  `;
+}
+
+// ─── TASKS TAB ───
+let taskFilter = 'all';
+
+function renderTasks() {
+  const d = getDayData(dk(currentDate));
+  const tasks = d.tasks || [];
+  const filtered = taskFilter === 'all' ? tasks : tasks.filter(t => t.category === taskFilter);
+
+  let html = `
+    <div class="task-add">
+      <input class="task-input" id="taskInput" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
+      <button class="add-btn" onclick="addTask()">Add</button>
+    </div>
+    <div class="filter-row">
+      ${['all','work','personal'].map(f => `<button class="filter-btn ${taskFilter === f ? 'active' : ''}" onclick="taskFilter='${f}';render()">${f}</button>`).join('')}
+      <button class="carry-btn" onclick="carryForward()">📋 Carry Forward</button>
+    </div>
+  `;
+
+  if (filtered.length === 0) {
+    html += '<div class="empty">No tasks yet. Add your first task above.</div>';
+  } else {
+    html += filtered.map(t => `
+      <div class="task-item" style="border-left:3.5px solid ${t.category === 'personal' ? 'var(--indigo)' : 'var(--green)'}">
+        <button class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask('${t.id}')">${t.done ? '✓' : ''}</button>
+        <span class="task-text ${t.done ? 'done' : ''}">${esc(t.text)}</span>
+        <span class="task-cat">${t.category || 'work'}</span>
+        <button class="task-del" onclick="deleteTask('${t.id}')">✕</button>
+      </div>
+    `).join('');
+
+    html += `<div class="task-stats">
+      <div><strong style="color:var(--green)">${tasks.filter(t=>t.done).length}</strong> done</div>
+      <div><strong style="color:var(--orange)">${tasks.filter(t=>!t.done).length}</strong> pending</div>
+      <div><strong>${tasks.length}</strong> total</div>
+    </div>`;
+  }
+  return html;
+}
+
+// ─── INSIGHTS TAB ───
+function renderInsights() {
+  const nudges = getNudges();
+  const key = dk(currentDate);
+  const d = getDayData(key);
+
+  let html = '';
+
+  // Nudges
+  html += `<div class="nudge-box">
+    <div class="card-header" style="color:var(--gold)"><span class="dot" style="background:var(--gold)"></span> Today's Nudges</div>
+    ${nudges.map(n => `<div class="nudge-item">${esc(n)}</div>`).join('')}
+  </div>`;
+
+  // 7-day trend
+  html += `<div class="card">
+    <div class="card-header"><span class="dot" style="background:var(--gold)"></span> 7-Day Score Trend</div>
+    <div class="trend-bar-row">
+      ${Array.from({length:7}).map((_,i) => {
+        const dt = new Date(currentDate.getTime() - (6-i) * 86400000);
+        const k = dk(dt);
+        const s = score(allData[k]);
+        const h = MAX_SCORE > 0 ? (s / MAX_SCORE) * 100 : 0;
+        const isT = k === todayKey();
+        const col = isT ? 'var(--gold)' : s > 0 ? 'var(--green)' : 'var(--border)';
+        return `<div class="trend-col">
+          <div class="trend-val">${s || '–'}</div>
+          <div class="trend-bar" style="height:${Math.max(h, 3)}%;background:${col}"></div>
+          <div class="trend-day ${isT ? 'today' : ''}">${dt.toLocaleDateString('en-IN',{weekday:'short'})}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+
+  // Category breakdown
+  html += `<div class="card">
+    <div class="card-header"><span class="dot" style="background:var(--gold)"></span> Category Breakdown</div>
+    ${[
+      { key:'morning', label:'Morning', color:'var(--orange)' },
+      { key:'work', label:'Work', color:'var(--green)' },
+      { key:'evening', label:'Evening', color:'var(--indigo)' }
+    ].map(cat => {
+      const items = ROUTINE.filter(r => r.cat === cat.key);
+      const done = items.filter(r => d.routine?.[r.id]).length;
+      const pct = items.length > 0 ? (done / items.length) * 100 : 0;
+      return `<div class="progress-row">
+        <div class="progress-label"><span style="text-transform:capitalize;font-weight:500">${cat.label}</span><span>${done}/${items.length}</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${cat.color}"></div></div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // Stats grid
+  const allScores = Object.values(allData).map(d => score(d)).filter(s => s > 0);
+  const best = allScores.length ? Math.max(...allScores) : 0;
+  const avg = allScores.length ? Math.round(allScores.reduce((a,b)=>a+b,0)/allScores.length) : 0;
+  const tracked = allScores.length;
+  html += `<div class="stat-grid" style="margin-bottom:14px">
+    <div class="stat-card"><div class="icon">🔥</div><div class="val">${getStreak()} days</div><div class="lbl">Current Streak</div></div>
+    <div class="stat-card"><div class="icon">🏆</div><div class="val">${best}</div><div class="lbl">Best Score</div></div>
+    <div class="stat-card"><div class="icon">📅</div><div class="val">${tracked}</div><div class="lbl">Days Tracked</div></div>
+    <div class="stat-card"><div class="icon">📊</div><div class="val">${avg}</div><div class="lbl">Average Score</div></div>
+  </div>`;
+
+  // Recent journals
+  html += `<div class="card">
+    <div class="card-header"><span class="dot" style="background:var(--gold)"></span> Recent Journal Entries</div>`;
+  let hasJournals = false;
+  for (let i = 1; i <= 5; i++) {
+    const dt = new Date(currentDate.getTime() - i * 86400000);
+    const dd = allData[dk(dt)];
+    if (dd?.journal?.trim()) {
+      hasJournals = true;
+      html += `<div class="journal-preview">
+        <div class="journal-date">${dt.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})} · Score: ${score(dd)}</div>
+        <div class="journal-text">${esc(dd.journal.slice(0,200))}${dd.journal.length>200?'...':''}</div>
+      </div>`;
+    }
+  }
+  if (!hasJournals) html += '<div class="empty" style="padding:16px">No recent journal entries. Start writing today.</div>';
+  html += '</div>';
+
+  // Export / Sync section
+  html += `<div class="export-section">
+    <button class="export-btn" onclick="exportJSON()">📥 Export JSON</button>
+    <button class="export-btn" onclick="syncToClaude()">⇧ Copy for Claude</button>
+    <button class="export-btn" onclick="importJSON()">📤 Import JSON</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+    <div style="font-size:0.65rem;color:var(--ink3);margin-top:8px;line-height:1.5">
+      Export your data and paste it in Claude for deep analysis.<br>
+      Or use "Copy for Claude" to copy the last 30 days to clipboard.
+    </div>
+  </div>`;
+
+  return html;
+}
+
+// ═══════════════════════════════════════════
+// EVENT HANDLERS
+// ═══════════════════════════════════════════
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function toggleRoutine(id) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.routine = d.routine || {};
+  d.routine[id] = !d.routine[id];
+  allData[key] = d;
+  saveCurrent();
+  render();
+}
+
+function toggleHabit(id) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.habits = d.habits || {};
+  d.habits[id] = !d.habits[id];
+  allData[key] = d;
+  saveCurrent();
+  render();
+}
+
+function setField(field, value) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d[field] = value;
+  allData[key] = d;
+  saveCurrent();
+  // Don't re-render for text fields to avoid cursor jump
+  updateStreak();
+}
+
+function setPriority(i, value) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.priorities = d.priorities || ['','',''];
+  d.priorities[i] = value;
+  allData[key] = d;
+  saveCurrent();
+}
+
+function addTask() {
+  const input = document.getElementById('taskInput');
+  if (!input || !input.value.trim()) return;
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.tasks = d.tasks || [];
+  d.tasks.push({
+    id: Date.now().toString(),
+    text: input.value.trim(),
+    done: false,
+    category: taskFilter === 'all' ? 'work' : taskFilter,
+    created: new Date().toISOString()
+  });
+  allData[key] = d;
+  saveCurrent();
+  input.value = '';
+  render();
+}
+
+function toggleTask(id) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.tasks = (d.tasks || []).map(t => t.id === id ? {...t, done: !t.done} : t);
+  allData[key] = d;
+  saveCurrent();
+  render();
+}
+
+function deleteTask(id) {
+  const key = dk(currentDate);
+  const d = getDayData(key);
+  d.tasks = (d.tasks || []).filter(t => t.id !== id);
+  allData[key] = d;
+  saveCurrent();
+  render();
+}
+
+function carryForward() {
+  const key = dk(currentDate);
+  const yKey = dk(new Date(currentDate.getTime() - 86400000));
+  const yTasks = (allData[yKey]?.tasks || []).filter(t => !t.done);
+  if (yTasks.length === 0) { showToast('No pending tasks from yesterday'); return; }
+  const d = getDayData(key);
+  d.tasks = d.tasks || [];
+  const existing = new Set(d.tasks.map(t => t.text));
+  let added = 0;
+  yTasks.forEach(t => {
+    if (!existing.has(t.text)) {
+      d.tasks.push({...t, id: Date.now().toString() + Math.random(), done: false});
+      added++;
+    }
+  });
+  allData[key] = d;
+  saveCurrent();
+  render();
+  showToast(`Carried forward ${added} task${added !== 1 ? 's' : ''}`);
+}
+
+function navDate(delta) {
+  const d = new Date(currentDate);
+  d.setDate(d.getDate() + delta);
+  if (d <= new Date()) { currentDate = d; render(); }
+}
+
+function goToday() { currentDate = new Date(); render(); }
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  render();
+}
+
+// ═══════════════════════════════════════════
+// SYNC & EXPORT
+// ═══════════════════════════════════════════
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dailyos-${todayKey()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Data exported');
+}
+
+function importJSON() { document.getElementById('importFile').click(); }
+
+async function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    for (const [key, val] of Object.entries(data)) {
+      allData[key] = val;
+      await idbSet(key, val);
+    }
+    render();
+    showToast(`Imported ${Object.keys(data).length} days`);
+  } catch (err) {
+    showToast('Import failed — invalid file');
+  }
+  e.target.value = '';
+}
+
+async function syncToClaude() {
+  const btn = document.getElementById('syncBtn');
+  btn.classList.add('syncing');
+  btn.textContent = '⇧ ...';
+
+  // Prepare last 30 days
+  const result = {};
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = dk(d);
+    if (allData[k] && score(allData[k]) > 0) result[k] = allData[k];
+  }
+
+  const payload = JSON.stringify(result, null, 2);
+
+  try {
+    await navigator.clipboard.writeText(payload);
+    showToast('Last 30 days copied — paste in Claude');
+  } catch {
+    // Fallback: create textarea
+    const ta = document.createElement('textarea');
+    ta.value = payload;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied — paste in Claude for analysis');
+  }
+
+  setTimeout(() => {
+    btn.classList.remove('syncing');
+    btn.textContent = '⇧ Sync';
+  }, 1500);
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+async function init() {
+  await openDB();
+  allData = await idbGetAll();
+  render();
+}
+
+init();
+
+// SERVICE WORKER
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
